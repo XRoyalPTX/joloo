@@ -5,7 +5,7 @@ from app.routers.trips import router as trips_router
 
 
 app = FastAPI(
-    title="zamdaa API",
+    title="Joloo API",
     description="бэкенд для сервиса поиска попутчиков в Бурятии (возможно, и не только в Бурятии)",
     version="0.0.0"
 )
