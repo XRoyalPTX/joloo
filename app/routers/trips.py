@@ -3,7 +3,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.models import User
 from app.schemas import TripCreate, TripResponse, TripRequestCreate, TripRequestResponse
 from app.database import get_db
-from app.crud import create_trip, create_trip_request, get_trips, change_trip_request_status
+from app.crud import (
+    create_trip, 
+    create_trip_request, 
+    get_trips, 
+    change_trip_request_status, 
+    cancel_trip_request
+)
 from typing import List
 from app.api import get_current_user
 
@@ -28,3 +34,12 @@ async def add_trip_request(trip_request_data: TripRequestCreate, db: AsyncSessio
 @router.patch("/requests/{trip_request_id}/status", response_model=TripRequestResponse)
 async def update_trip_request_status(answer: bool, trip_request_id: int, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     return await change_trip_request_status(db=db, answer=answer, trip_request_id=trip_request_id, current_user_id=current_user.id)
+
+
+@router.patch("/requests/{trip_request_id}/cancel", response_model=TripRequestResponse)
+async def cancel_trip_request_status(
+    trip_request_id: int, 
+    db: AsyncSession = Depends(get_db), 
+    current_user: User = Depends(get_current_user)
+):
+    return await cancel_trip_request(db=db, trip_request_id=trip_request_id, current_user_id=current_user.id)

@@ -32,6 +32,39 @@ async def get_trips(db: AsyncSession, from_location_id: int | None = None, to_lo
 
 
 async def create_trip_request(db: AsyncSession, trip_request_schema: TripRequestCreate, requester_id: int):
+    current_trip = await db.get(Trip, trip_request_schema.trip_id)
+    if not current_trip:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Данная поездка не найдена"
+        )
+    
+    if current_trip.driver_id == requester_id:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Нельзя отправлять заявку свою же поездку"
+        )
+    
+    query = select(TripRequest).where(
+        TripRequest.trip_id == trip_request_schema.trip_id,
+        TripRequest.requester_id == requester_id,
+        TripRequest.status != "cancelled"
+    )
+    result = await db.execute(query)
+    existing_request = result.scalar_one_or_none()
+
+    if existing_request:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="У Вас уже есть заявка на данную поездку"
+        )
+    
+    if current_trip.seats < trip_request_schema.seats_requested:
+         raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Недостаточно свободных мест. Доступно: {current_trip.seats}"
+        )
+
     trip_request_dict = trip_request_schema.model_dump()
 
     trip_request_dict["requester_id"] = requester_id
@@ -52,7 +85,7 @@ async def change_trip_request_status(db: AsyncSession, answer: bool, trip_reques
     if not trip_request:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Не был найден запрос поездки"
+            detail="Не найдена заявка на поездку"
         )
     
     query = select(Trip).where(Trip.id == trip_request.trip_id)
@@ -68,11 +101,68 @@ async def change_trip_request_status(db: AsyncSession, answer: bool, trip_reques
     if trip.driver_id != current_user_id:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="У вас нет прав для изменения статуса данного запроса" 
+            detail="У вас нет прав для изменения статуса данной заявки" 
         )
 
-    trip_request.status = "accepted" if answer else "rejected"
+    if answer:
+        if trip.seats < trip_request.seats_requested:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="К сожалению, места закончились"
+            )
+        trip.seats -= trip_request.seats_requested
+        trip_request.status = "accepted"
+        query = select(TripRequest).where(
+            TripRequest.trip_id == trip.id,
+            TripRequest.status == "pending",
+            TripRequest.seats_requested > trip.seats
+        )
+        result = await db.execute(query)
+        all_requests = result.scalars().all()
+
+        for r in all_requests:
+            r.status = "rejected"
+    else:
+        trip_request.status = "rejected"
+
     await db.commit()
     await db.refresh(trip_request)
     
+    return trip_request
+
+
+async def cancel_trip_request(db: AsyncSession, trip_request_id: int, current_user_id: int):
+    trip_request = await db.get(TripRequest, trip_request_id)
+    if not trip_request:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Не найдена заявка на поездку"
+        )
+    
+    trip = await db.get(Trip, trip_request.trip_id)
+    if not trip:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Связанная поездка не найдена"
+        )
+    
+    if trip_request.requester_id != current_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="У вас нет прав для изменения статуса данной заявки"
+        )
+    
+    if trip_request.status == "cancelled" or trip_request.status == "rejected":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Заявка уже отменена или отклонена"
+        )
+    
+    if trip_request.status == "accepted":
+        trip.seats += trip_request.seats_requested
+    
+    trip_request.status = "cancelled"
+
+    await db.commit()
+    await db.refresh(trip_request)
     return trip_request
