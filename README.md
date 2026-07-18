@@ -40,9 +40,40 @@ docker compose exec app python seed.py
 
 ## Структура базы данных 
 ### 1. Модель Location
+*   ```id```
+*   ```country```
+*   ```region```
+*   ```district```
+*   ```name```
+
 ### 2. Модель User
+*   ```id```
+*   ```name```
+*   ```surname```
+*   ```patronymic```
+*   ```birth_date```
+*   ```password```
+*   ```email```
+*   ```phone_number```
+*   ```is_active```
+*   ```is_staff```
+
 ### 3. Модель Trip
+*   ```id```
+*   ```driver_id```
+*   ```from_location_id```
+*   ```to_location_id```
+*   ```price```
+*   ```seats```
+*   ```date```
+*   ```comment```
+
 ### 4. Модель TripRequest
+*   ```id```
+*   ```requester_id```
+*   ```trip_id```
+*   ```seats_requested```
+*   ```status```: "pending", "accepted", "rejected", "cancelled"
 
 ## Roadmap проекта
 pass
