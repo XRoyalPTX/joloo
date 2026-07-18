@@ -1,5 +1,5 @@
 from sqlalchemy import String, Integer, Boolean, Date, DateTime, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
 import datetime
@@ -30,18 +30,27 @@ class Location(Base):
 class Trip(Base):
     __tablename__ = "trips"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    driver_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    from_location_id: Mapped[int] = mapped_column(ForeignKey("locations.id"), nullable=False)
-    to_location_id: Mapped[int] = mapped_column(ForeignKey("locations.id"), nullable=False)
     price: Mapped[int] = mapped_column(Integer, nullable=False)
     seats: Mapped[int] = mapped_column(Integer, nullable=False)
     date: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     comment: Mapped[str | None] = mapped_column(String, nullable=True)
 
+    driver_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    from_location_id: Mapped[int] = mapped_column(ForeignKey("locations.id"), nullable=False)
+    to_location_id: Mapped[int] = mapped_column(ForeignKey("locations.id"), nullable=False)
+
+    driver: Mapped["User"] = relationship(foreign_keys=[driver_id])
+    from_location: Mapped["Location"] = relationship(foreign_keys=[from_location_id])
+    to_location: Mapped["Location"] = relationship(foreign_keys=[to_location_id])
+
 class TripRequest(Base):
     __tablename__ = "triprequests"
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    requester_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
-    trip_id: Mapped[int] = mapped_column(ForeignKey("trips.id"), nullable=False)
     seats_requested: Mapped[int] = mapped_column(Integer, nullable=False, default=1)
     status: Mapped[str] = mapped_column(String(25), nullable=False)
+
+    requester_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)
+    trip_id: Mapped[int] = mapped_column(ForeignKey("trips.id"), nullable=False)
+
+    requester: Mapped["User"] = relationship(foreign_keys=[requester_id])
+    trip: Mapped["Trip"] = relationship(foreign_keys=[trip_id])
