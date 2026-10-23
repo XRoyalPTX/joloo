@@ -419,6 +419,7 @@ export function App() {
         isOpen={isLocationsOpen}
         onClose={() => setIsLocationsOpen(false)}
         locations={locations}
+        currentUser={currentUser}
         onLocationsUpdated={() => {
           fetchLocations();
         }}

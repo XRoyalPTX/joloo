@@ -1,4 +1,4 @@
-import { useState, type FC, type FormEvent } from 'react';
+import { useState, useEffect, type FC, type FormEvent } from 'react';
 import { api } from '../api';
 import { Location } from '../types';
 import { PlusCircle, AlertCircle, CheckCircle } from 'lucide-react';
@@ -16,8 +16,8 @@ export const CreateTripModal: FC<CreateTripModalProps> = ({
   locations,
   onTripCreated,
 }) => {
-  const [fromLocationId, setFromLocationId] = useState<number>(locations[0]?.id || 1);
-  const [toLocationId, setToLocationId] = useState<number>(locations[1]?.id || 2);
+  const [fromLocationId, setFromLocationId] = useState<number>(0);
+  const [toLocationId, setToLocationId] = useState<number>(0);
   const [price, setPrice] = useState<number>(500);
   const [seats, setSeats] = useState<number>(3);
   const [date, setDate] = useState<string>('2026-06-15T10:00');
@@ -26,12 +26,26 @@ export const CreateTripModal: FC<CreateTripModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  // Синхронизируем дефолтные ID локаций, когда список загружен
+  useEffect(() => {
+    if (locations.length > 0) {
+      if (!fromLocationId) setFromLocationId(locations[0].id);
+      if (!toLocationId) setToLocationId(locations[1]?.id || locations[0].id);
+    }
+  }, [locations, fromLocationId, toLocationId]);
+
   if (!isOpen) return null;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
+
+    if (!fromLocationId || !toLocationId) {
+      setError('Пожалуйста, выберите пункты отправления и назначения');
+      setLoading(false);
+      return;
+    }
 
     if (fromLocationId === toLocationId) {
       setError('Место отправления и прибытия не могут совпадать');
@@ -100,7 +114,7 @@ export const CreateTripModal: FC<CreateTripModalProps> = ({
               >
                 {locations.map((loc) => (
                   <option key={loc.id} value={loc.id}>
-                    {loc.name}
+                    {loc.name} {loc.district ? `(${loc.district})` : ''}
                   </option>
                 ))}
               </select>
@@ -115,7 +129,7 @@ export const CreateTripModal: FC<CreateTripModalProps> = ({
               >
                 {locations.map((loc) => (
                   <option key={loc.id} value={loc.id}>
-                    {loc.name}
+                    {loc.name} {loc.district ? `(${loc.district})` : ''}
                   </option>
                 ))}
               </select>
