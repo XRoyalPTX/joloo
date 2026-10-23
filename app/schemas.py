@@ -79,7 +79,10 @@ class UserCreate(BaseModel):
     
     @field_validator("patronymic")
     @classmethod
-    def format_patronymic(cls, value: str) -> str:
+    def format_patronymic(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        
         clean_value = value.strip()
         
         words = clean_value.split("-")
@@ -117,6 +120,7 @@ class UserResponse(BaseModel):
     birth_date: date
     email: str | None = None
     phone_number: str
+    is_staff: bool
     is_active: bool
 
     model_config = {"from_attributes": True}

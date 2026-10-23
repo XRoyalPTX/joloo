@@ -15,7 +15,9 @@ class User(Base):
     password: Mapped[str] = mapped_column(String, nullable=False)
     email: Mapped[str | None] = mapped_column(String(50), nullable=True, unique=True)
     phone_number: Mapped[str] = mapped_column(String(20), nullable=False, unique=True)
-    is_active: Mapped[bool] = mapped_column(Boolean, default=False)
+    
+    # На время отсуствия нормальной регистрации по умолчанию is_active = True
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True) 
     is_staff: Mapped[bool] = mapped_column(Boolean, default=False)
 
 
