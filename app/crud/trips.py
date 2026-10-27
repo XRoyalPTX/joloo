@@ -221,3 +221,19 @@ async def cancel_trip_request(db: AsyncSession, trip_request_id: int, current_us
     
     final_result = await db.execute(final_query)
     return final_result.scalar_one()
+
+
+async def get_current_user_trips(db: AsyncSession, current_user_id: int):
+    query = (
+        select(TripRequest).
+        options(
+            joinedload(TripRequest.requester),
+            joinedload(TripRequest.trip).joinedload(Trip.driver),
+            joinedload(TripRequest.trip).joinedload(Trip.from_location),
+            joinedload(TripRequest.trip).joinedload(Trip.to_location)
+        )
+        .where(TripRequest.requester_id == current_user_id) 
+    )
+    result = await db.execute(query)
+
+    return result.scalars().all()

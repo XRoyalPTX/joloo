@@ -4,6 +4,7 @@ import { Location, Trip, User } from './types';
 import { AuthModal } from './components/AuthModal';
 import { CreateTripModal } from './components/CreateTripModal';
 import { ManageLocationsModal } from './components/ManageLocationsModal';
+import { PassengerBookingsModal } from './components/PassengerBookingsModal';
 import {
   Car,
   Search,
@@ -15,7 +16,8 @@ import {
   LogOut,
   ArrowRight,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Ticket
 } from 'lucide-react';
 
 export function App() {
@@ -32,6 +34,7 @@ export function App() {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isCreateTripOpen, setIsCreateTripOpen] = useState(false);
   const [isLocationsOpen, setIsLocationsOpen] = useState(false);
+  const [isBookingsOpen, setIsBookingsOpen] = useState(false);
 
   // Booking action feedback
   const [bookingStatus, setBookingStatus] = useState<{ tripId: number; message: string; isError?: boolean } | null>(null);
@@ -156,6 +159,14 @@ export function App() {
 
             {currentUser ? (
               <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsBookingsOpen(true)}
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-medium px-3 py-2 rounded-xl flex items-center gap-1.5 transition border border-slate-200"
+                >
+                  <Ticket className="w-4 h-4 text-sky-600" />
+                  <span>Мои бронирования</span>
+                </button>
+
                 <button
                   onClick={() => setIsCreateTripOpen(true)}
                   className="bg-sky-600 hover:bg-sky-700 text-white text-sm font-medium px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm transition"
@@ -422,6 +433,14 @@ export function App() {
         currentUser={currentUser}
         onLocationsUpdated={() => {
           fetchLocations();
+        }}
+      />
+
+      <PassengerBookingsModal
+        isOpen={isBookingsOpen}
+        onClose={() => setIsBookingsOpen(false)}
+        onExploreTrips={() => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
       />
     </div>
