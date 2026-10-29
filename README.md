@@ -62,7 +62,7 @@ npm run dev
 *   `id`, `name`, `surname`, `patronymic`, `birth_date`, `password`, `email`, `phone_number`, `is_active`, `is_staff`
 
 ### 3. Модель Trip
-*   `id`, `driver_id`, `from_location_id`, `to_location_id`, `price`, `seats`, `date`, `comment`
+*   `id`, `driver_id`, `from_location_id`, `to_location_id`, `price`, `seats`, `departure_date`, `arrival_date`, `comment`
 
 ### 4. Модель TripRequest
 *   `id`, `requester_id`, `trip_id`, `seats_requested`, `status` (`"pending"`, `"accepted"`, `"rejected"`, `"cancelled"`)
@@ -80,12 +80,13 @@ npm run dev
 - [x] Клиентский веб-интерфейс (React + TypeScript + Tailwind CSS + Vite) и согласование контрактов (`docs/API_CONTRACT.md`).
 
 ### Этап 2: Личный кабинет и управление поездками (В работе 🚧)
-- [ ] **Issue #1:** Эндпоинт получения заявок текущего пассажира (`GET /trips/requests/my`).
-- [ ] **Issue #2:** Эндпоинт получения поездок текущего водителя (`GET /trips/my`).
+- [x] **Issue #1:** Эндпоинт получения заявок текущего пассажира (`GET /trips/requests/my`) + интерфейс «Мои бронирования».
+- [x] **Issue #2:** Эндпоинт получения поездок текущего водителя (`GET /trips/my`) + интерфейс «Мои поездки».
 - [ ] **Issue #3:** Просмотр входящих заявок по конкретной поездке для водителя (`GET /trips/{trip_id}/requests`).
 - [ ] **Issue #4:** Фильтрация поездок по дате выезда и скрытие прошедших поездок (`GET /trips/?date=...`).
 - [ ] **Issue #5:** Отмена и редактирование самой поездки водителем (`DELETE / PATCH /trips/{trip_id}`).
-- [ ] Интеграция раздела «Мои поездки и заявки» на фронтенде (кнопки подтверждения/отклонения для водителя и отмены для пассажира).
+- [x] **Issue #6:** Защита от пересекающихся поездок водителя (`departure_date`, `arrival_date`, интервальная проверка в БД и миграция Alembic).
+- [ ] Интеграция действий водителя (принятие/отклонение конкретной заявки пассажира прямо из списка поездок).
 
 ### Этап 3: Улучшение пользовательского опыта и надежности (Планы 📋)
 - [ ] Валидация бизнес-правил в схемах и сервисах (запрет `price < 0`, `seats <= 0`, `from_location_id == to_location_id`, дата в прошлом).
