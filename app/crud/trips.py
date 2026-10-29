@@ -24,7 +24,7 @@ async def create_trip(db: AsyncSession, trip_schema: TripCreate, driver_id: int)
 
     found = await db.execute(query)
 
-    if found.scalar_one_or_none():
+    if found.scalars().first():
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Данная поездка пересекается по времени с одной из Ваших поездок"

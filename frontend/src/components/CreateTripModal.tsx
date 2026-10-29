@@ -20,7 +20,8 @@ export const CreateTripModal: FC<CreateTripModalProps> = ({
   const [toLocationId, setToLocationId] = useState<number>(0);
   const [price, setPrice] = useState<number>(500);
   const [seats, setSeats] = useState<number>(3);
-  const [date, setDate] = useState<string>('2026-06-15T10:00');
+  const [departureDate, setDepartureDate] = useState<string>('2026-06-15T10:00');
+  const [arrivalDate, setArrivalDate] = useState<string>('2026-06-15T13:00');
   const [comment, setComment] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -53,13 +54,23 @@ export const CreateTripModal: FC<CreateTripModalProps> = ({
       return;
     }
 
+    const depTime = new Date(departureDate).getTime();
+    const arrTime = new Date(arrivalDate).getTime();
+
+    if (arrTime <= depTime) {
+      setError('Время прибытия должно быть позже времени выезда');
+      setLoading(false);
+      return;
+    }
+
     try {
       await api.post('/trips/', {
         from_location_id: Number(fromLocationId),
         to_location_id: Number(toLocationId),
         price: Number(price),
         seats: Number(seats),
-        date: new Date(date).toISOString(),
+        departure_date: new Date(departureDate).toISOString(),
+        arrival_date: new Date(arrivalDate).toISOString(),
         comment: comment || null,
       });
 
@@ -78,7 +89,7 @@ export const CreateTripModal: FC<CreateTripModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 relative">
+      <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 relative max-h-[92vh] overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 text-xl font-bold"
@@ -164,15 +175,28 @@ export const CreateTripModal: FC<CreateTripModalProps> = ({
             </div>
           </div>
 
-          <div>
-            <label className="text-xs font-semibold text-gray-600">Дата и время выезда</label>
-            <input
-              type="datetime-local"
-              required
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full mt-1 px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-sky-500"
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-semibold text-gray-600">Время выезда</label>
+              <input
+                type="datetime-local"
+                required
+                value={departureDate}
+                onChange={(e) => setDepartureDate(e.target.value)}
+                className="w-full mt-1 px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-gray-600">Примерное прибытие</label>
+              <input
+                type="datetime-local"
+                required
+                value={arrivalDate}
+                onChange={(e) => setArrivalDate(e.target.value)}
+                className="w-full mt-1 px-3 py-2 border rounded-xl text-sm outline-none focus:ring-2 focus:ring-sky-500"
+              />
+            </div>
           </div>
 
           <div>

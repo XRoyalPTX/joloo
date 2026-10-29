@@ -140,7 +140,8 @@
       "to_location_id": 1,
       "price": 600,
       "seats": 3,
-      "date": "2026-06-01T09:00:00Z",
+      "departure_date": "2026-06-01T09:00:00Z",
+      "arrival_date": "2026-06-01T12:00:00Z",
       "comment": "Выезжаю от ЖД вокзала, багажник свободный",
       "driver": {
         "id": 2,
@@ -174,7 +175,8 @@
     "to_location_id": 1,
     "price": 600,
     "seats": 3,
-    "date": "2026-06-01T09:00:00Z",
+    "departure_date": "2026-06-01T09:00:00Z",
+    "arrival_date": "2026-06-01T12:00:00Z",
     "comment": "Выезжаю от ЖД вокзала"
   }
   ```

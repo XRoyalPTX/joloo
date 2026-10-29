@@ -31,7 +31,8 @@ export interface Trip {
   to_location_id: number;
   price: number;
   seats: number;
-  date: string;
+  departure_date: string;
+  arrival_date: string;
   comment?: string | null;
   driver: UserPublic;
   from_location: Location;

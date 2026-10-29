@@ -48,17 +48,29 @@ export const DriverTripsModal: FC<DriverTripsModalProps> = ({
 
   if (!isOpen) return null;
 
-  const formatDate = (isoString: string) => {
+  const formatTripTime = (depIso: string, arrIso?: string) => {
     try {
-      const date = new Date(isoString);
-      return date.toLocaleString('ru-RU', {
+      const dep = new Date(depIso);
+      const depDateStr = dep.toLocaleString('ru-RU', {
         day: 'numeric',
         month: 'long',
+      });
+      const depTimeStr = dep.toLocaleTimeString('ru-RU', {
         hour: '2-digit',
         minute: '2-digit',
       });
+
+      if (!arrIso) return `${depDateStr}, ${depTimeStr}`;
+
+      const arr = new Date(arrIso);
+      const arrTimeStr = arr.toLocaleTimeString('ru-RU', {
+        hour: '2-digit',
+        minute: '2-digit',
+      });
+
+      return `${depDateStr} • ${depTimeStr} → ~${arrTimeStr}`;
     } catch {
-      return isoString;
+      return depIso;
     }
   };
 
@@ -141,7 +153,7 @@ export const DriverTripsModal: FC<DriverTripsModalProps> = ({
                   <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
                     <div className="flex items-center gap-1">
                       <Calendar className="w-3.5 h-3.5 text-sky-600" />
-                      <span>{formatDate(trip.date)}</span>
+                      <span>{formatTripTime(trip.departure_date, trip.arrival_date)}</span>
                     </div>
 
                     <div className="flex items-center gap-1">
