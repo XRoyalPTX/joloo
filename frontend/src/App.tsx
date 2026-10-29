@@ -5,6 +5,7 @@ import { AuthModal } from './components/AuthModal';
 import { CreateTripModal } from './components/CreateTripModal';
 import { ManageLocationsModal } from './components/ManageLocationsModal';
 import { PassengerBookingsModal } from './components/PassengerBookingsModal';
+import { DriverTripsModal } from './components/DriverTripsModal';
 import {
   Car,
   Search,
@@ -35,6 +36,7 @@ export function App() {
   const [isCreateTripOpen, setIsCreateTripOpen] = useState(false);
   const [isLocationsOpen, setIsLocationsOpen] = useState(false);
   const [isBookingsOpen, setIsBookingsOpen] = useState(false);
+  const [isDriverTripsOpen, setIsDriverTripsOpen] = useState(false);
 
   // Booking action feedback
   const [bookingStatus, setBookingStatus] = useState<{ tripId: number; message: string; isError?: boolean } | null>(null);
@@ -164,7 +166,15 @@ export function App() {
                   className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-medium px-3 py-2 rounded-xl flex items-center gap-1.5 transition border border-slate-200"
                 >
                   <Ticket className="w-4 h-4 text-sky-600" />
-                  <span>Мои бронирования</span>
+                  <span className="hidden sm:inline">Бронирования</span>
+                </button>
+
+                <button
+                  onClick={() => setIsDriverTripsOpen(true)}
+                  className="bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs sm:text-sm font-medium px-3 py-2 rounded-xl flex items-center gap-1.5 transition border border-slate-200"
+                >
+                  <Car className="w-4 h-4 text-emerald-600" />
+                  <span className="hidden sm:inline">Мои поездки</span>
                 </button>
 
                 <button
@@ -442,6 +452,12 @@ export function App() {
         onExploreTrips={() => {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
+      />
+
+      <DriverTripsModal
+        isOpen={isDriverTripsOpen}
+        onClose={() => setIsDriverTripsOpen(false)}
+        onCreateNewTrip={() => setIsCreateTripOpen(true)}
       />
     </div>
   );

@@ -9,7 +9,8 @@ from app.crud import (
     get_trips, 
     change_trip_request_status, 
     cancel_trip_request,
-    get_current_user_trips
+    get_current_user_trip_requests,
+    get_current_driver_trips
 )
 from typing import List
 from app.api import get_current_user, check_is_staff
@@ -64,8 +65,16 @@ async def cancel_trip_request_status(
 
 
 @router.get("/requests/my", response_model=List[TripRequestResponse])
-async def read_current_user_trips(
+async def read_current_user_trip_requests(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    return await get_current_user_trips(db=db, current_user_id=current_user.id)
+    return await get_current_user_trip_requests(db=db, current_user_id=current_user.id)
+
+
+@router.get("/my", response_model=List[TripResponse])
+async def read_current_driver_trips(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user)
+):
+    return await get_current_driver_trips(db=db, current_user_id=current_user.id)
