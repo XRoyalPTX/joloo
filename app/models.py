@@ -34,7 +34,8 @@ class Trip(Base):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
     price: Mapped[int] = mapped_column(Integer, nullable=False)
     seats: Mapped[int] = mapped_column(Integer, nullable=False)
-    date: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    departure_date: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
+    arrival_date: Mapped[datetime.datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     comment: Mapped[str | None] = mapped_column(String, nullable=True)
 
     driver_id: Mapped[int] = mapped_column(ForeignKey("users.id"), nullable=False)

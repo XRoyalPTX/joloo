@@ -139,7 +139,8 @@ class TripCreate(BaseModel):
     to_location_id: int
     price: int
     seats: int
-    date: datetime
+    departure_date: datetime
+    arrival_date: datetime
     comment: str | None = None
 
 
@@ -153,7 +154,8 @@ class TripResponse(BaseModel):
     to_location: LocationResponse
     price: int
     seats: int
-    date: datetime
+    departure_date: datetime
+    arrival_date: datetime
     comment: str | None = None
 
     model_config = {"from_attributes": True}
